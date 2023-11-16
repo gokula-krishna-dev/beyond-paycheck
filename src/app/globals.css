@@ -1,0 +1,13 @@
+.green {
+    height: 100vh;
+    margin: 0;
+    background: radial-gradient(circle at bottom center, green, transparent);
+    transition: opacity 1s linear;
+}
+
+.danger {
+    height: 100vh;
+    margin: 0;
+    background: radial-gradient(circle at bottom center, red, transparent);
+    transition: opacity 1s linear;
+}
