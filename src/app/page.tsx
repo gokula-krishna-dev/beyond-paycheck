@@ -10,10 +10,10 @@ import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 import NavDropdown from 'react-bootstrap/NavDropdown';
 import { TypeAnimation } from 'react-type-animation';
-import { Line } from 'react-chartjs-2';
+import { Line, Doughnut } from 'react-chartjs-2';
 import Carousel from 'react-bootstrap/Carousel';
 import Image from 'react-bootstrap/Image';
-
+import Table from "react-bootstrap/Table";
 
 import React, { useState } from 'react';
 import {
@@ -25,10 +25,13 @@ import {
   Title,
   Tooltip,
   Legend,
+  ArcElement,
 } from 'chart.js';
 
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+
+ChartJS.register(ArcElement);
 
 function LearnMoreModal() {
   const [show, setShow] = useState(false);
@@ -42,7 +45,7 @@ function LearnMoreModal() {
         Learn more
       </Button>
 
-      <Modal show={show} onHide={handleClose}>
+      <Modal show={show} onHide={handleClose} size="xl">
         <Modal.Header closeButton>
           <Modal.Title>Hey Chris,</Modal.Title>
         </Modal.Header>
@@ -50,7 +53,7 @@ function LearnMoreModal() {
           <TypeAnimation
             sequence={[
               // Same substring at the start will only be typed out once, initially
-              "I've been thinking about your financial situation, and I believe setting up automatic savings could be a real game-changer for you. There are apps that can link to your bank account and automatically transfer a small, manageable amount to your savings. This way, you're consistently building up a reserve without even having to think about it. Also, looking at your recent transactions, it might be worth reconsidering expenses in certain areas. For instance, you've had a few high spends on Entertainment and Travel. While it's important to enjoy life, maybe scaling back on these could help free up more funds for debt repayment. It's all about finding the right balance.",
+              "Given your financial situation, I believe setting up automatic savings could be a real game-changer for you. Also, looking at your recent transactions, it might be worth reconsidering expenses in certain areas. For instance, you've had a few high spends on Entertainment and Travel. While it's important to enjoy life, maybe scaling back on these could help free up more funds for debt repayment.",
             ]}
             wrapper="span"
             speed={50}
@@ -63,7 +66,57 @@ function LearnMoreModal() {
             Cancel
           </Button>
           <Button variant="primary" onClick={handleClose}>
-            Make a purchase
+            Execute recommendation
+          </Button>
+        </Modal.Footer>
+      </Modal>
+    </>
+  );
+}
+
+function ViewStatementModal(transactionData: any) {
+  const [show, setShow] = useState(false);
+
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
+
+  console.log(transactionData.transaction.doughnutData);
+  return (
+    <>
+      <Button variant="primary" onClick={handleShow}>
+        View Statement
+      </Button>
+
+
+      <Modal show={show} onHide={handleClose}>
+        <Modal.Header closeButton>
+          <Modal.Title>Your transactions</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <Doughnut data={transactionData.transaction.doughnutData} />
+          <Table striped bordered hover>
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Category</th>
+              </tr>
+            </thead>
+            <tbody>
+              {transactionData.transaction.transactionData.map((transaction: any, index: number) => (
+                <tr key={index}>
+                  <td>{transaction.Date}</td>
+                  <td>{transaction.Amount}</td>
+                  <td>{transaction.Category}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleClose}>
+            Cancel
           </Button>
         </Modal.Footer>
       </Modal>
@@ -121,6 +174,30 @@ const rawDataset = {
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
       ],
+    },
+    transactions: [
+      { "Date": "2023-10-06", "Category": "Medical", "Amount": -34.73 },
+      { "Date": "2023-08-18", "Category": "Electronics", "Amount": -419.81 },
+      { "Date": "2023-07-18", "Category": "Entertainment", "Amount": -487.5 },
+      { "Date": "2023-06-27", "Category": "Groceries", "Amount": -182.91 },
+      { "Date": "2023-06-25", "Category": "Utilities", "Amount": -441.3 },
+      { "Date": "2023-06-08", "Category": "Medical", "Amount": -97.23 },
+      { "Date": "2023-05-12", "Category": "Dining Out", "Amount": -355.69 },
+      { "Date": "2023-04-20", "Category": "Education", "Amount": -285.74 },
+      { "Date": "2023-04-18", "Category": "Medical", "Amount": -455.96 },
+      { "Date": "2023-04-12", "Category": "Entertainment", "Amount": -77.05 }
+    ],
+    doughnut: {
+      labels: ["Essentials", "Non-essentials"],
+      datasets: [{
+        label: 'Spend by category',
+        data: [52.78, 47.22],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(255, 205, 86)',
+        ],
+        hoverOffset: 4
+      }]
     }
   },
   'jordan': {
@@ -141,6 +218,30 @@ const rawDataset = {
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
       ],
+    },
+    transactions: [
+      { "Date": "2023-10-06", "Category": "Medical", "Amount": -34.73 },
+      { "Date": "2023-08-18", "Category": "Electronics", "Amount": -419.81 },
+      { "Date": "2023-07-18", "Category": "Entertainment", "Amount": -487.5 },
+      { "Date": "2023-06-27", "Category": "Groceries", "Amount": -182.91 },
+      { "Date": "2023-06-25", "Category": "Utilities", "Amount": -441.3 },
+      { "Date": "2023-06-08", "Category": "Medical", "Amount": -97.23 },
+      { "Date": "2023-05-12", "Category": "Dining Out", "Amount": -355.69 },
+      { "Date": "2023-04-20", "Category": "Education", "Amount": -285.74 },
+      { "Date": "2023-04-18", "Category": "Medical", "Amount": -455.96 },
+      { "Date": "2023-04-12", "Category": "Entertainment", "Amount": -77.05 }
+    ],
+    doughnut: {
+      labels: ["Essentials", "Non-essentials"],
+      datasets: [{
+        label: 'Spend by category',
+        data: [52.78, 47.22],
+        backgroundColor: [
+          'rgb(255, 99, 132)',
+          'rgb(255, 205, 86)',
+        ],
+        hoverOffset: 4
+      }]
     }
   },
   'smith': {
@@ -161,6 +262,30 @@ const rawDataset = {
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
       ],
+    },
+    transactions: [
+      { "Date": "2023-09-27", "Category": "Groceries", "Amount": -266.31 },
+      { "Date": "2023-08-20", "Category": "Utilities", "Amount": -436.26 },
+      { "Date": "2023-08-05", "Category": "Entertainment", "Amount": -485.27 },
+      { "Date": "2023-05-20", "Category": "Electronics", "Amount": -499.71 },
+      { "Date": "2023-05-03", "Category": "Groceries", "Amount": -299.76 },
+      { "Date": "2023-04-07", "Category": "Travel", "Amount": -280.59 },
+      { "Date": "2023-03-28", "Category": "Travel", "Amount": -118.27 },
+      { "Date": "2023-03-07", "Category": "Entertainment", "Amount": -243.68 },
+      { "Date": "2023-02-19", "Category": "Utilities", "Amount": -460.01 },
+      { "Date": "2023-02-06", "Category": "Miscellaneous", "Amount": -483.33 }
+    ],
+    doughnut: {
+      labels: ["Essentials", "Non-essentials"],
+      datasets: [{
+        label: 'Spend by category',
+        data: [40.93, 59.07],
+        backgroundColor: [
+          'rgb(255, 205, 86)',
+          'rgb(255, 99, 132)',
+        ],
+        hoverOffset: 4
+      }]
     }
   },
   'chris': {
@@ -181,21 +306,50 @@ const rawDataset = {
           backgroundColor: 'rgba(255, 99, 132, 0.5)',
         },
       ],
+    },
+    transactions: [
+      { "Date": "2023-09-27", "Category": "Groceries", "Amount": -266.31 },
+      { "Date": "2023-08-20", "Category": "Utilities", "Amount": -436.26 },
+      { "Date": "2023-08-05", "Category": "Entertainment", "Amount": -485.27 },
+      { "Date": "2023-05-20", "Category": "Electronics", "Amount": -499.71 },
+      { "Date": "2023-05-03", "Category": "Groceries", "Amount": -299.76 },
+      { "Date": "2023-04-07", "Category": "Travel", "Amount": -280.59 },
+      { "Date": "2023-03-28", "Category": "Travel", "Amount": -118.27 },
+      { "Date": "2023-03-07", "Category": "Entertainment", "Amount": -243.68 },
+      { "Date": "2023-02-19", "Category": "Utilities", "Amount": -460.01 },
+      { "Date": "2023-02-06", "Category": "Miscellaneous", "Amount": -483.33 }
+    ],
+    doughnut: {
+      labels: ["Essentials", "Non-essentials"],
+      datasets: [{
+        label: 'Spend by category',
+        data: [40.93, 59.07],
+        backgroundColor: [
+          'rgb(255, 205, 86)',
+          'rgb(255, 99, 132)',
+        ],
+        hoverOffset: 4
+      }]
     }
+
   },
 }
 
 const Home = () => {
   const [isGoodProfile, setIsGoodProfile] = useState(true);
   const [chartData, setChartData] = useState(rawDataset['alex'].chart);
+  const [transactionData, setTransactionData] = useState(rawDataset['alex'].transactions);
+  const [doughnutData, setDoughnutData] = useState(rawDataset['alex'].doughnut);
 
   const handleClick = (name: string) => {
     console.log(name);
     setIsGoodProfile(() => rawDataset[name].isGoodProfile);
     setChartData(() => rawDataset[name].chart);
+    setTransactionData(() => rawDataset[name].transactions);
+    setDoughnutData(() => rawDataset[name].doughnut);
   };
 
-
+  console.log(chartData)
   return (
     <div className={isGoodProfile ? "green" : "danger"}>
       <Navbar expand="lg" className="bg-body-tertiary">
@@ -226,8 +380,7 @@ const Home = () => {
                   <Card.Title>Net worth</Card.Title>
                   <Card.Text style={{ textAlign: 'center' }}>
                     <Line data={chartData} />
-                    <Button>View transactions history</Button>
-
+                    <ViewStatementModal transaction={{ transactionData, doughnutData }} />
                   </Card.Text>
                 </Card.Body>
               </Card>
@@ -240,58 +393,18 @@ const Home = () => {
                   <Carousel slide={true}>
                     <Carousel.Item>
                       <Image src="/prudential.png" height={"340px"} width={"600"} />
-                      <Carousel.Caption>
-                        <h3>First slide label</h3>
-                        <p>Nulla vitae elit libero, a pharetra augue mollis interdum.</p>
-                      </Carousel.Caption>
                     </Carousel.Item>
                     <Carousel.Item>
                       <Image src="/dbs.png" height={"340px"} width={"600"} />
-                      <Carousel.Caption>
-                        <h3>Second slide label</h3>
-                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                      </Carousel.Caption>
                     </Carousel.Item>
                     <Carousel.Item>
                       <Image src="/choclate.png" height={"340px"} width={"600"} />
-                      <Carousel.Caption>
-                        <h3>Third slide label</h3>
-                        <p>
-                          Praesent commodo cursus magna, vel scelerisque nisl consectetur.
-                        </p>
-                      </Carousel.Caption>
                     </Carousel.Item>
                   </Carousel>
                   <div style={{ textAlign: 'center', marginTop: '1em' }}>
                     <LearnMoreModal />
                   </div>
 
-                </Card.Body>
-              </Card>
-            </Col>
-          </Row>
-
-        </Container>
-
-        <Container style={{ marginTop: "1em" }}>
-
-          <Row>
-            <Col>
-              <Card>
-                <Card.Body>
-                  <Card.Title>Hey Chris,</Card.Title>
-                  <Card.Text>
-                    {/* <TypeAnimation
-                      sequence={[
-                        // Same substring at the start will only be typed out once, initially
-                        "I've been thinking about your financial situation, and I believe setting up automatic savings could be a real game-changer for you. There are apps that can link to your bank account and automatically transfer a small, manageable amount to your savings. This way, you're consistently building up a reserve without even having to think about it. Also, looking at your recent transactions, it might be worth reconsidering expenses in certain areas. For instance, you've had a few high spends on Entertainment and Travel. While it's important to enjoy life, maybe scaling back on these could help free up more funds for debt repayment. It's all about finding the right balance.",
-                      ]}
-                      wrapper="span"
-                      speed={50}
-                      style={{ fontSize: '2em', display: 'inline-block' }}
-                      repeat={Infinity}
-                    /> */}
-                  </Card.Text>
                 </Card.Body>
               </Card>
             </Col>
