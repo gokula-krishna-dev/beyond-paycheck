@@ -15,7 +15,7 @@ import Carousel from 'react-bootstrap/Carousel';
 import Image from 'react-bootstrap/Image';
 import Table from "react-bootstrap/Table";
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -33,11 +33,36 @@ import Modal from 'react-bootstrap/Modal';
 
 ChartJS.register(ArcElement);
 
-function LearnMoreModal() {
+
+const Typewriter = ({ text, delay }) => {
+  const [currentText, setCurrentText] = useState('');
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  useEffect(() => {
+    if (currentIndex < text.length) {
+      const timeout = setTimeout(() => {
+        setCurrentText(prevText => prevText + text[currentIndex]);
+        setCurrentIndex(prevIndex => prevIndex + 1);
+      }, delay);
+
+      return () => clearTimeout(timeout);
+    }
+  }, [currentIndex, delay, text]);
+
+  return <span>{currentText}</span>;
+};
+
+function LearnMoreModal({ recommendationDescription }) {
   const [show, setShow] = useState(false);
 
-  const handleClose = () => setShow(false);
+  const [purchaseConfirmation, setPurchaseConfirmation] = useState(false);
+
+  const handleClose = () => { setShow(false); setPurchaseConfirmation(false); }
   const handleShow = () => setShow(true);
+
+  const handlePurchase = () => {
+    setPurchaseConfirmation(true);
+  };
 
   return (
     <>
@@ -49,23 +74,19 @@ function LearnMoreModal() {
         <Modal.Header closeButton>
           <Modal.Title>Hey Chris,</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          <TypeAnimation
-            sequence={[
-              // Same substring at the start will only be typed out once, initially
-              "Given your financial situation, I believe setting up automatic savings could be a real game-changer for you. Also, looking at your recent transactions, it might be worth reconsidering expenses in certain areas. For instance, you've had a few high spends on Entertainment and Travel. While it's important to enjoy life, maybe scaling back on these could help free up more funds for debt repayment.",
-            ]}
-            wrapper="span"
-            speed={50}
-            style={{ fontSize: '2em', display: 'inline-block' }}
-            repeat={Infinity}
-          />
+        <Modal.Body style={{ textAlign: "center" }}>
+          {purchaseConfirmation ?
+            <b>Thank you for your purchase!</b>
+            :
+            <Typewriter delay={10} text={recommendationDescription} />
+          }
+
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleClose}>
             Cancel
           </Button>
-          <Button variant="primary" onClick={handleClose}>
+          <Button variant="primary" onClick={handlePurchase}>
             Execute recommendation
           </Button>
         </Modal.Footer>
@@ -198,7 +219,11 @@ const rawDataset = {
         ],
         hoverOffset: 4
       }]
-    }
+    },
+    personality: "Smart Saver",
+    name: "Alex",
+    recommendation: "/prudential.png",
+    recommendationDescription: "It's time to amplify your financial wellness! Our analysis shows you're quite balanced in managing essentials and non-essentials. To take it up a notch, we recommend tweaking your entertainment and dining-out budgets. Shaving off a bit here can bolster your debt repayment efforts, accelerating your journey towards a debt-free life. Also, consider beefing up your emergency fund. Just a small increase each month can create a solid financial cushion. Keep up the great work, and let's aim for even more financial stability!"
   },
   'jordan': {
     isGoodProfile: true,
@@ -242,7 +267,11 @@ const rawDataset = {
         ],
         hoverOffset: 4
       }]
-    }
+    },
+    personality: "Out of Debt",
+    name: "Jordan",
+    recommendation: "/dbs.png",
+    recommendationDescription: "It's time to amplify your financial wellness! Our analysis shows you're quite balanced in managing essentials and non-essentials. To take it up a notch, we recommend tweaking your entertainment and dining-out budgets. Shaving off a bit here can bolster your debt repayment efforts, accelerating your journey towards a debt-free life. Also, consider beefing up your emergency fund. Just a small increase each month can create a solid financial cushion. Keep up the great work, and let's aim for even more financial stability!"
   },
   'smith': {
     isGoodProfile: false,
@@ -286,7 +315,11 @@ const rawDataset = {
         ],
         hoverOffset: 4
       }]
-    }
+    },
+    personality: "Globe Trotter",
+    name: "Smith",
+    recommendation: "/dbs.png",
+    recommendationDescription: "Given your financial situation, I believe setting up automatic savings could be a real game-changer for you. Also, looking at your recent transactions, it might be worth reconsidering expenses in certain areas. For instance, you've had a few high spends on Entertainment and Travel. While it's important to enjoy life, maybe scaling back on these could help free up more funds for debt repayment."
   },
   'chris': {
     isGoodProfile: false,
@@ -330,8 +363,11 @@ const rawDataset = {
         ],
         hoverOffset: 4
       }]
-    }
-
+    },
+    personality: "Debt Wrangler",
+    name: "Chris",
+    recommendation: "/choclate.png",
+    recommendationDescription: "Given your financial situation, I believe setting up automatic savings could be a real game-changer for you. Also, looking at your recent transactions, it might be worth reconsidering expenses in certain areas. For instance, you've had a few high spends on Entertainment and Travel. While it's important to enjoy life, maybe scaling back on these could help free up more funds for debt repayment."
   },
 }
 
@@ -340,6 +376,10 @@ const Home = () => {
   const [chartData, setChartData] = useState(rawDataset['alex'].chart);
   const [transactionData, setTransactionData] = useState(rawDataset['alex'].transactions);
   const [doughnutData, setDoughnutData] = useState(rawDataset['alex'].doughnut);
+  const [personality, setPersonality] = useState(rawDataset['alex'].personality);
+  const [name, setName] = useState(rawDataset['alex'].name);
+  const [recommendation, setRecommendation] = useState(rawDataset['alex'].recommendation);
+  const [recommendationDescription, setRecommendationDescription] = useState(rawDataset['alex'].recommendationDescription);
 
   const handleClick = (name: string) => {
     console.log(name);
@@ -347,6 +387,10 @@ const Home = () => {
     setChartData(() => rawDataset[name].chart);
     setTransactionData(() => rawDataset[name].transactions);
     setDoughnutData(() => rawDataset[name].doughnut);
+    setPersonality(() => rawDataset[name].personality);
+    setName(() => rawDataset[name].name);
+    setRecommendation(() => rawDataset[name].recommendation);
+    setRecommendationDescription(() => rawDataset[name].recommendationDescription);
   };
 
   console.log(chartData)
@@ -388,21 +432,14 @@ const Home = () => {
 
             <Col>
               <Card>
-                <Card.Body>
+                <Card.Body style={{ textAlign: 'center' }}>
                   <Card.Title>Your recommendation</Card.Title>
-                  <Carousel slide={true}>
-                    <Carousel.Item>
-                      <Image src="/prudential.png" height={"340px"} width={"600"} />
-                    </Carousel.Item>
-                    <Carousel.Item>
-                      <Image src="/dbs.png" height={"340px"} width={"600"} />
-                    </Carousel.Item>
-                    <Carousel.Item>
-                      <Image src="/choclate.png" height={"340px"} width={"600"} />
-                    </Carousel.Item>
-                  </Carousel>
+                  <p>
+                    Hi {name}, you are a <b>{personality}!</b> Based on your profile, we recommend the following:
+                  </p>
+                  <Image src={recommendation} height={"340px"} width={"512"} />
                   <div style={{ textAlign: 'center', marginTop: '1em' }}>
-                    <LearnMoreModal />
+                    <LearnMoreModal recommendationDescription={recommendationDescription} />
                   </div>
 
                 </Card.Body>
